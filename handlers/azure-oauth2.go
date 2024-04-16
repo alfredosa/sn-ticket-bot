@@ -16,18 +16,33 @@ type TokenResponseSuccess struct {
 	ExpiresIn   int    `json:"expires_in"`
 }
 
-type AuthConfig struct {
-	ClientID     string
-	ClientSecret string
-	ClientScope  string
+func GenericHTTPRequest(method, url string, headers map[string]string, body io.Reader) (*http.Response, error) {
+	// Create a new request
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	for key, value := range headers {
+		req.Header.Add(key, value)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }
 
 func RequestAccessTokenInfo(tenantId string) (*TokenResponseSuccess, error) {
-	config := AuthConfig{
-		ClientID:     os.Getenv("AZ_CLIENT_ID"),
-		ClientSecret: os.Getenv("AZ_CLIENT_SECRET"),
-		ClientScope:  os.Getenv("AZ_OAUTH_SCOPE"),
-	}
+	var (
+		client_id     = os.Getenv("AZ_CLIENT_ID")
+		client_secret = os.Getenv("AZ_CLIENT_SECRET")
+		scope         = os.Getenv("AZ_OAUTH_SCOPE")
+	)
+
 	if tenantId == "" {
 		return nil, fmt.Errorf("tenantId is empty")
 	}
@@ -35,10 +50,10 @@ func RequestAccessTokenInfo(tenantId string) (*TokenResponseSuccess, error) {
 	authUrl := "https://login.microsoftonline.com/" + tenantId + "/oauth2/v2.0/token"
 
 	bodyData := url.Values{}
-	bodyData.Set("client_id", config.ClientID)
-	bodyData.Set("client_secret", config.ClientSecret)
+	bodyData.Set("client_id", client_id)
+	bodyData.Set("client_secret", client_secret)
 	bodyData.Set("grant_type", "client_credentials")
-	bodyData.Set("scope", config.ClientScope)
+	bodyData.Set("scope", scope)
 	body := bodyData.Encode()
 	bodyBuffer := bytes.NewBuffer([]byte(body))
 
@@ -48,7 +63,7 @@ func RequestAccessTokenInfo(tenantId string) (*TokenResponseSuccess, error) {
 		return nil, fmt.Errorf("error creating request: %v", err)
 	}
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	request.SetBasicAuth(url.QueryEscape(config.ClientID), url.QueryEscape(config.ClientSecret))
+	request.SetBasicAuth(url.QueryEscape(client_id), url.QueryEscape(client_secret))
 
 	// post request
 	client := &http.Client{}
