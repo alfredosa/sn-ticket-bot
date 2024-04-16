@@ -7,11 +7,13 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/alfredosa/sn-ticket-bot/env"
 	"github.com/alfredosa/sn-ticket-bot/routers"
 	"github.com/jmoiron/sqlx"
 )
 
 func main() {
+	env.InitEnvironments()
 
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
