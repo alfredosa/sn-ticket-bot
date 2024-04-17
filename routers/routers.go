@@ -13,7 +13,7 @@ func Routers(db *sqlx.DB) *chi.Mux {
 
 	apiRouter := chi.NewRouter()
 	apiRouter.Get("/healthz", api_config.HealthHandler)
-
+	apiRouter.Post("/create-sn-ticket", api_config.ServiceNowWebHookHandler)
 	r.Mount("/api", apiRouter)
 
 	adminRouter := chi.NewRouter()

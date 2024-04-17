@@ -27,7 +27,6 @@ func main() {
 		log.Printf("Closed DB Connection")
 
 		log.Printf("Cleanup completed. Exiting...")
-
 		os.Exit(0)
 	}()
 

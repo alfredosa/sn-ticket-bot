@@ -52,6 +52,8 @@ func (a *APIConfig) HealthHandler(w http.ResponseWriter, r *http.Request) {
 
 func (a *APIConfig) ServiceNowWebHookHandler(w http.ResponseWriter, r *http.Request) {
 
+	CreateServiceNowTicket()
+
 	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(http.StatusText(http.StatusOK)))
