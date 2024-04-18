@@ -2,7 +2,7 @@ build:
 	@go build -o bin/sn-bot
 
 test:
-	@go test ./...
+	@cd $(CURDIR) && go test -v ./...
 
 run: build test 
 	@echo "Binary built, running:"
